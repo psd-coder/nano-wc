@@ -75,8 +75,11 @@ export function createReactiveProps<Schema extends PropsSchema>(
         return store.get();
       },
       set(value: string | null) {
-        updater(value);
-        host.setAttribute(key, String(value));
+        if (value === null) {
+          host.removeAttribute(key);
+        } else {
+          host.setAttribute(key, String(value));
+        }
       },
     });
   }
