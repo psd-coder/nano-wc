@@ -108,18 +108,14 @@ export abstract class UIComponent<
     }
   }
 
-  /**
-   * Dispatches a bubbling, cancelable `CustomEvent` with the given name and optional detail.
-   * Returns `false` if the event was cancelled via `preventDefault()`.
-   */
-  emit<T extends string, D>(eventName: T, detail?: D, options?: CustomEventInit): void {
-    const event = new CustomEvent<D>(eventName, {
-      bubbles: true,
-      cancelable: true,
-      ...options,
-      detail,
-    });
-    this.dispatchEvent(event);
+  /** Dispatches an existing Event, or creates and dispatches a bubbling CustomEvent. */
+  emit(event: Event): void;
+  emit<D>(name: string, detail?: D, options?: Omit<CustomEventInit<D>, "detail">): void;
+  emit(nameOrEvent: string | Event, detail?: unknown, options?: CustomEventInit): void {
+    if (nameOrEvent instanceof Event) return void this.dispatchEvent(nameOrEvent);
+    this.dispatchEvent(
+      new CustomEvent(nameOrEvent, { bubbles: true, composed: true, ...options, detail }),
+    );
   }
 
   /**
