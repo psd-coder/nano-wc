@@ -12,8 +12,8 @@ export const propBuilders: {
   boolean: () =>
     v.pipe(
       v.unknown(),
-      v.union([v.literal("true"), v.literal("false"), v.null()]),
-      v.transform((str) => str === "true"),
+      v.union([v.literal("true"), v.literal("false"), v.literal(""), v.null()]),
+      v.transform((str) => str === "true" || str === ""),
     ),
 };
 
