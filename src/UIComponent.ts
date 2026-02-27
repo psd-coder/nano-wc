@@ -41,7 +41,7 @@ export abstract class UIComponent<
 
   abstract get refs(): InferRefs<Refs>;
   abstract get props(): ReactiveProps<Props>;
-  abstract get host(): HTMLElement;
+  abstract get host(): HTMLElement & ComponentProps<Props>;
 
   /** Clears the element cache and runs all registered cleanup functions. */
   protected disconnectedCallback(): void {

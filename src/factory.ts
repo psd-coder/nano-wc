@@ -1,7 +1,15 @@
 // oxlint-disable max-classes-per-file
 import { atom } from "nanostores";
 
-import type { AnySchema, Infer, InferRefs, PropsSchema, ReactiveProps, RefsSchema } from "./types";
+import type {
+  AnySchema,
+  ComponentProps,
+  Infer,
+  InferRefs,
+  PropsSchema,
+  ReactiveProps,
+  RefsSchema,
+} from "./types";
 import { UIComponent, type ComponentCtor, type SetupFn } from "./UIComponent";
 import { invariant } from "./utils.ts";
 
@@ -151,8 +159,8 @@ export function createComponent<
     static readonly elementName = name;
     #props!: ReactivePropsResult<Props>;
 
-    get host(): HTMLElement {
-      return this;
+    get host(): HTMLElement & ComponentProps<Props> {
+      return this as HTMLElement & ComponentProps<Props>;
     }
 
     get refs(): InferRefs<Refs> {
