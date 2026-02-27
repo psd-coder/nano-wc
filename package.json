@@ -9,7 +9,10 @@
     }
   },
   "files": [
-    "dist"
+    "dist/*",
+    "package.json",
+    "README.md",
+    "LICENSE.md"
   ],
   "scripts": {
     "build": "tsdown",
