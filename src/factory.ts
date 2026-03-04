@@ -27,6 +27,18 @@ function hasBlockingCustomElementAncestor(
   return false;
 }
 
+function isDangerousPrototypeProp(host: HTMLElement, key: string): boolean {
+  let proto = Object.getPrototypeOf(host);
+  while (proto) {
+    const desc = Object.getOwnPropertyDescriptor(proto, key);
+    if (desc) {
+      return typeof desc.value === "function" || !desc.configurable;
+    }
+    proto = Object.getPrototypeOf(proto);
+  }
+  return false;
+}
+
 export function parseWithSchema<S extends AnySchema>(
   schema: S,
   value: unknown,
@@ -72,7 +84,7 @@ export function createReactiveProps<Schema extends PropsSchema>(
     (stores as Record<string, unknown>)[`$${key}`] = store;
     updaters[key] = updater;
 
-    invariant(!(key in host), `reserved prop: ${key}`);
+    invariant(!isDangerousPrototypeProp(host, key), `reserved prop: ${key}`);
     Object.defineProperty(host, key, {
       enumerable: true,
       get() {

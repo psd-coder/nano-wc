@@ -37,18 +37,25 @@ describe("parseWithSchema", () => {
 });
 
 describe("createReactiveProps — reserved name guard", () => {
-  it("throws when prop name conflicts with HTMLElement property", () => {
+  it("throws when prop name conflicts with a prototype method", () => {
     const div = document.createElement("div");
-    expect(() => createReactiveProps(div, { className: propBuilders.string() })).toThrow(
+    expect(() => createReactiveProps(div, { getAttribute: propBuilders.string() })).toThrow(
       /reserved/,
     );
   });
 
-  it("throws when prop name conflicts with prototype method", () => {
+  it("throws when prop name conflicts with prototype method on component", () => {
     const tag = uniqueTag("rp");
     const Component = createComponent(tag, {}, {}, () => {});
     const el = new Component();
     expect(() => createReactiveProps(el, { emit: propBuilders.string() })).toThrow(/reserved/);
+  });
+
+  it("allows configurable prototype accessor props like lang and className", () => {
+    const div = document.createElement("div");
+    expect(() =>
+      createReactiveProps(div, { lang: propBuilders.string(), className: propBuilders.string() }),
+    ).not.toThrow();
   });
 });
 

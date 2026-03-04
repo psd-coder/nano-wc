@@ -76,7 +76,7 @@
   "size-limit": [
     {
       "path": "dist/index.mjs",
-      "limit": "2667 B"
+      "limit": "2743 B"
     },
     {
       "path": "dist/render.mjs",
