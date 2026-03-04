@@ -5,6 +5,7 @@ import type {
   ComponentProps,
   Infer,
   InferRefs,
+  Prettify,
   PropsSchema,
   ReactiveProps,
   RefsSchema,
@@ -29,7 +30,8 @@ export type ComponentCtor<
   Name extends string,
   Props extends PropsSchema,
   Refs extends RefsSchema,
-  Mixin = Record<string, never>,
+  // oxlint-disable-next-line typescript-eslint/no-empty-object-type
+  Mixin = {},
 > = (new () => UIComponent<Props, Refs> & ComponentProps<Props> & Mixin) & {
   readonly elementName: Name;
 };
@@ -41,8 +43,8 @@ export abstract class UIComponent<
   #cache = new Map<string, unknown>();
   #cleanups: VoidFunction[] = [];
 
-  abstract get refs(): InferRefs<Refs>;
-  abstract get props(): ReactiveProps<Props>;
+  abstract get refs(): Prettify<InferRefs<Refs>>;
+  abstract get props(): Prettify<ReactiveProps<Props>>;
   abstract get host(): HTMLElement & ComponentProps<Props>;
 
   protected disconnectedCallback(): void {

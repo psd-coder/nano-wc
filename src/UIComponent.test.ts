@@ -108,7 +108,8 @@ describe("lifecycle cleanup", () => {
   });
 
   it("SetupContext exposes UIComponent API and omits HTMLElement members (only on type level)", () => {
-    type Ctx = SetupContext<Record<string, never>, Record<string, never>>;
+    // oxlint-disable-next-line typescript-eslint/no-empty-object-type
+    type Ctx = SetupContext<{}, {}>;
     expectTypeOf<Ctx>().toHaveProperty("props");
     expectTypeOf<Ctx>().toHaveProperty("refs");
     expectTypeOf<Ctx>().toHaveProperty("host");

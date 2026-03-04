@@ -61,3 +61,7 @@ export type InferRef<M> = M extends {
 export type InferRefs<Schema extends RefsSchema> = {
   [Key in keyof Schema]: InferRef<Schema[Key]>;
 };
+
+export type Prettify<T> = {
+  [Key in keyof T]: T[Key];
+} & {};

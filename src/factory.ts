@@ -156,7 +156,8 @@ export function createComponent<
   const Name extends string,
   Props extends PropsSchema,
   Refs extends RefsSchema,
-  Mixin = Record<string, never>,
+  // oxlint-disable-next-line typescript-eslint/no-empty-object-type
+  Mixin = {},
 >(
   name: Name,
   propsSchema: Props,

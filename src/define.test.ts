@@ -126,7 +126,8 @@ describe("define", () => {
       const tag = uniqueTag("ty") as "x-ty-inf4";
       const Component = define(tag).setup(() => {});
       const el = new Component();
-      expectTypeOf(el.props).toEqualTypeOf<ReactiveProps<Record<string, never>>>();
+      // oxlint-disable-next-line typescript-eslint/no-empty-object-type
+      expectTypeOf(el.props).toEqualTypeOf<ReactiveProps<{}>>();
     });
   });
 

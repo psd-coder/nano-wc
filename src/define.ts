@@ -5,8 +5,10 @@ import { createComponent } from "./factory.ts";
 
 export class ComponentBuilder<
   Name extends string,
-  Props extends PropsSchema = Record<string, never>,
-  Refs extends RefsSchema = Record<string, never>,
+  // oxlint-disable-next-line typescript-eslint/no-empty-object-type
+  Props extends PropsSchema = {},
+  // oxlint-disable-next-line typescript-eslint/no-empty-object-type
+  Refs extends RefsSchema = {},
 > {
   readonly name: Name;
   readonly propsSchema: Props;
@@ -39,7 +41,8 @@ export class ComponentBuilder<
     } as Refs & R);
   }
 
-  setup<M extends Record<string, unknown> = Record<string, never>>(
+  // oxlint-disable-next-line typescript-eslint/no-empty-object-type
+  setup<M extends Record<string, unknown> = {}>(
     setupFn: (ctx: SetupContext<Props, Refs>) => M | void,
   ): ComponentCtor<Name, Props, Refs, M> {
     return createComponent<Name, Props, Refs, M>(
@@ -54,17 +57,22 @@ export class ComponentBuilder<
 export function define<const Name extends string>(name: Name): ComponentBuilder<Name>;
 export function define<
   const Name extends string,
-  M extends Record<string, unknown> = Record<string, never>,
+  // oxlint-disable-next-line typescript-eslint/no-empty-object-type
+  M extends Record<string, unknown> = {},
 >(
   name: Name,
-  setup: (ctx: SetupContext<Record<string, never>, Record<string, never>>) => M | void,
-): ComponentCtor<Name, Record<string, never>, Record<string, never>, M>;
+  // oxlint-disable-next-line typescript-eslint/no-empty-object-type
+  setup: (ctx: SetupContext<{}, {}>) => M | void,
+  // oxlint-disable-next-line typescript-eslint/no-empty-object-type
+): ComponentCtor<Name, {}, {}, M>;
 export function define<const Name extends string>(
   name: Name,
-  setup?: SetupFn<Record<string, never>, Record<string, never>>,
+  // oxlint-disable-next-line typescript-eslint/no-empty-object-type
+  setup?: SetupFn<{}, {}>,
 ) {
   if (setup) {
-    return createComponent(name, {} as Record<string, never>, {} as Record<string, never>, setup);
+    // oxlint-disable-next-line typescript-eslint/no-empty-object-type
+    return createComponent(name, {} as {}, {} as {}, setup);
   }
   return new ComponentBuilder(name);
 }
