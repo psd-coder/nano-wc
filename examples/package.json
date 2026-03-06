@@ -9,8 +9,16 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@codemirror/lang-css": "^6.3.1",
+    "@codemirror/lang-html": "^6.4.9",
+    "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/lang-json": "^6.0.1",
+    "@codemirror/state": "^6.5.4",
     "astro": "^5.17.1",
-    "nanoid": "^5.1.6"
+    "codemirror": "^6.0.1",
+    "nanoid": "^5.1.6",
+    "nanostores": "^1.1.1",
+    "valibot": "^1.2.0"
   },
   "devDependencies": {
     "@types/node": "^25.3.5"

@@ -1,0 +1,14 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import styles from "./styles.module.css";
+
+type Props = HTMLAttributes<'div'>
+
+const { class: className, lang, ...rest } = Astro.props;
+---
+<x-code-editor class:list={[styles.host, className]} lang={lang} {...rest}>
+  <slot />
+</x-code-editor>
+<script>
+  import "./components";
+</script>
