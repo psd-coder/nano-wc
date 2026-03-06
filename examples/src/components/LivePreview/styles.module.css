@@ -1,0 +1,11 @@
+.host {
+  display: contents;
+}
+
+.frame {
+  flex: 1;
+  width: 100%;
+  border: none;
+  display: block;
+  min-height: 0;
+}
