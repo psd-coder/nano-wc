@@ -98,6 +98,12 @@ export abstract class UIComponent<
     type: string,
     listener: (this: HTMLElement | Document | Window, ev: Event) => any,
     options?: boolean | AddEventListenerOptions,
+  ): void;
+  on(
+    target: HTMLElement | HTMLElement[] | Document | Window,
+    type: string,
+    listener: (this: HTMLElement | Document | Window, ev: Event) => any,
+    options?: boolean | AddEventListenerOptions,
   ): void {
     const targets = Array.isArray(target) ? target : [target];
     for (const t of targets) {
