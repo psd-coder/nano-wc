@@ -115,7 +115,7 @@ export function collectRefs<Refs extends RefsSchema>(
     const entry = schema[key];
     invariant(entry, `${host.tagName} component. No schema found for ref "${key}"`);
     const isListRef = "__list" in entry && entry.__list === true;
-    const sel = entry.__options?.selector ?? refSelector(key);
+    const sel = entry.__selector ?? refSelector(key);
     const ownedSel = refSelector(key, hostTag);
     const all = host.querySelectorAll(`${sel},${ownedSel}`);
     const shallow: Element[] = [];

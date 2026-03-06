@@ -132,7 +132,7 @@ describe("collectRefs", () => {
 
     it("finds by custom selector", () => {
       const host = createHostWith('<span class="custom">Hello</span>');
-      const refs = collectRefs(host, { title: refBuilders.one({ selector: ".custom" }) });
+      const refs = collectRefs(host, { title: refBuilders.one(".custom") });
       expect(refs.title).toBe(host.querySelector(".custom"));
     });
 

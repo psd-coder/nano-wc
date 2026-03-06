@@ -2,7 +2,7 @@ import * as v from "valibot";
 
 import type { StandardSchemaV1 } from "@standard-schema/spec";
 
-import type { ListRefMarker, RefOptions, SingleRefMarker } from "./types";
+import type { ListRefMarker, SingleRefMarker } from "./types";
 
 function getBaseSchema<V>(fallback?: V) {
   return fallback !== undefined ? v.nullish(v.unknown(), fallback) : v.unknown();
@@ -43,75 +43,44 @@ function buildRefSchema(tag: string | undefined) {
     : v.instance(Element);
 }
 
-function one(): SingleRefMarker;
-function one(options: RefOptions): SingleRefMarker;
-function one<const Tag extends keyof HTMLElementTagNameMap>(tag: Tag): SingleRefMarker<Tag>;
-function one<const Tag extends keyof HTMLElementTagNameMap>(
-  tag: Tag,
-  options: RefOptions,
-): SingleRefMarker<Tag>;
-function one<const Tag extends keyof HTMLElementTagNameMap>(
-  options: RefOptions,
-): SingleRefMarker<Tag>;
-function one<const Tags extends readonly (keyof HTMLElementTagNameMap)[]>(
-  tags: Tags,
-): SingleRefMarker<Tags[number]>;
-function one<const Tags extends readonly (keyof HTMLElementTagNameMap)[]>(
-  tags: Tags,
-  options: RefOptions,
-): SingleRefMarker<Tags[number]>;
-function one<El extends Element>(): SingleRefMarker & { readonly __el: El };
-function one<El extends Element>(options: RefOptions): SingleRefMarker & { readonly __el: El };
-function one(
-  tagOrOptions?: string | readonly string[] | RefOptions,
-  options?: RefOptions,
-): SingleRefMarker {
-  const tag = typeof tagOrOptions === "string" ? tagOrOptions : undefined;
-  const tags = Array.isArray(tagOrOptions) ? (tagOrOptions as string[]) : undefined;
-  const opts =
-    typeof tagOrOptions === "object" && !Array.isArray(tagOrOptions) ? tagOrOptions : options;
+const TAG_RE = /^[a-z][a-z0-9-]*$/;
+
+function parseRefArgs(tagOrSelector?: string | readonly string[]) {
+  const tag =
+    typeof tagOrSelector === "string" && TAG_RE.test(tagOrSelector) ? tagOrSelector : undefined;
+  const sel = typeof tagOrSelector === "string" && !tag ? tagOrSelector : undefined;
   return {
-    ...(tag && { __tag: tag }),
-    ...(tags && { __tag: tags[0] }),
-    ...(opts && { __options: opts }),
-    schema: tags ? buildRefSchema(undefined) : buildRefSchema(tag),
-  } as SingleRefMarker;
+    ...(sel && { __selector: sel }),
+    schema: buildRefSchema(tag),
+  };
+}
+
+function one(): SingleRefMarker;
+function one<const Tag extends keyof HTMLElementTagNameMap>(tag: Tag): SingleRefMarker<Tag>;
+function one<const Tag extends keyof HTMLElementTagNameMap>(selector: string): SingleRefMarker<Tag>;
+function one<const Tags extends readonly (keyof HTMLElementTagNameMap)[]>(
+  tags: Tags,
+): SingleRefMarker<Tags[number]>;
+function one(selectors: readonly string[]): SingleRefMarker;
+function one<El extends Element>(): SingleRefMarker & { readonly __el: El };
+function one<El extends Element>(selector: string): SingleRefMarker & { readonly __el: El };
+function one(selector: string): SingleRefMarker;
+function one(tagOrSelector?: string | readonly string[]): SingleRefMarker {
+  return parseRefArgs(tagOrSelector) as SingleRefMarker;
 }
 
 function many(): ListRefMarker;
-function many(options: RefOptions): ListRefMarker;
 function many<const Tag extends keyof HTMLElementTagNameMap>(tag: Tag): ListRefMarker<Tag>;
-function many<const Tag extends keyof HTMLElementTagNameMap>(
-  tag: Tag,
-  options: RefOptions,
-): ListRefMarker<Tag>;
-function many<const Tag extends keyof HTMLElementTagNameMap>(
-  options: RefOptions,
-): ListRefMarker<Tag>;
+function many<const Tag extends keyof HTMLElementTagNameMap>(selector: string): ListRefMarker<Tag>;
 function many<const Tags extends readonly (keyof HTMLElementTagNameMap)[]>(
   tags: Tags,
 ): ListRefMarker<Tags[number]>;
-function many<const Tags extends readonly (keyof HTMLElementTagNameMap)[]>(
-  tags: Tags,
-  options: RefOptions,
-): ListRefMarker<Tags[number]>;
+function many(selectors: readonly string[]): ListRefMarker;
 function many<El extends Element>(): ListRefMarker & { readonly __el: El };
-function many<El extends Element>(options: RefOptions): ListRefMarker & { readonly __el: El };
-function many(
-  tagOrOptions?: string | readonly string[] | RefOptions,
-  options?: RefOptions,
-): ListRefMarker {
-  const tag = typeof tagOrOptions === "string" ? tagOrOptions : undefined;
-  const tags = Array.isArray(tagOrOptions) ? (tagOrOptions as string[]) : undefined;
-  const opts =
-    typeof tagOrOptions === "object" && !Array.isArray(tagOrOptions) ? tagOrOptions : options;
-  return {
-    __list: true as const,
-    ...(tag && { __tag: tag }),
-    ...(tags && { __tag: tags[0] }),
-    ...(opts && { __options: opts }),
-    schema: tags ? buildRefSchema(undefined) : buildRefSchema(tag),
-  } as ListRefMarker;
+function many<El extends Element>(selector: string): ListRefMarker & { readonly __el: El };
+function many(selector: string): ListRefMarker;
+function many(tagOrSelector?: string | readonly string[]): ListRefMarker {
+  return { __list: true as const, ...parseRefArgs(tagOrSelector) } as ListRefMarker;
 }
 
 export const refBuilders: { one: typeof one; many: typeof many } = {

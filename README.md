@@ -111,11 +111,11 @@ Both `r.one()` and `r.many()` are generic. When you pass a tag name, it's used f
 }))
 ```
 
-By default, refs match `[data-ref="name"]`. When you need a custom CSS selector, pass an options object instead. The return type falls back to `Element` since there's no tag name to infer from:
+By default, refs match `[data-ref="name"]`. When you need a custom CSS selector, pass it as a string — non-tag strings (containing `.`, `#`, `[`, etc.) are treated as selectors. The return type falls back to `Element` since there's no tag name to infer from:
 
 ```typescript
 .withRefs((r) => ({
-  custom: r.one({ selector: ".my-trigger" }),  // Element (no runtime tag check)
+  custom: r.one(".my-trigger"),  // Element (no runtime tag check)
 }))
 ```
 
@@ -123,7 +123,7 @@ To get proper typing with a custom selector, pass the tag name as a generic para
 
 ```typescript
 .withRefs((r) => ({
-  custom: r.one<"button">({ selector: ".my-trigger" }),  // HTMLButtonElement (no runtime tag check)
+  custom: r.one<"button">(".my-trigger"),  // HTMLButtonElement (no runtime tag check)
 }))
 ```
 

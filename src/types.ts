@@ -19,10 +19,6 @@ export type ComponentProps<Schema extends PropsSchema> = {
   [Key in keyof Schema]: Infer<Schema[Key]>;
 };
 
-export type RefOptions = {
-  readonly selector?: string;
-};
-
 // Store __tag (tag name literal) instead of _type (element type).
 // Using HTMLElementTagNameMap[Tag] directly in the marker would force TypeScript to eagerly
 // evaluate the whole map, causing circular references when the component itself is registered
@@ -30,14 +26,14 @@ export type RefOptions = {
 // __tag is conditionally present: omitted when Tag is undefined (untyped ref → Element fallback).
 export type SingleRefMarker<Tag extends keyof HTMLElementTagNameMap | undefined = undefined> = {
   readonly __list?: false;
-  readonly __options?: RefOptions;
+  readonly __selector?: string;
   readonly schema: AnySchema;
   // oxlint-disable-next-line typescript-eslint/ban-types, typescript-eslint/no-empty-object-type
 } & ([Tag] extends [undefined] ? {} : { readonly __tag: Tag & keyof HTMLElementTagNameMap });
 
 export type ListRefMarker<Tag extends keyof HTMLElementTagNameMap | undefined = undefined> = {
   readonly __list: true;
-  readonly __options?: RefOptions;
+  readonly __selector?: string;
   readonly schema: AnySchema;
   // oxlint-disable-next-line typescript-eslint/ban-types, typescript-eslint/no-empty-object-type
 } & ([Tag] extends [undefined] ? {} : { readonly __tag: Tag & keyof HTMLElementTagNameMap });

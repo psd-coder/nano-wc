@@ -9,7 +9,6 @@ export type {
   Infer,
   ReactiveProps,
   ComponentProps,
-  RefOptions,
   SingleRefMarker,
   ListRefMarker,
   RefsSchema,

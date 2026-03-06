@@ -86,20 +86,34 @@ describe("refBuilders", () => {
       expect(parseWithSchema(marker.schema, el, "test")).toBe(el);
     });
 
-    it("stores __options when given options", () => {
-      const opts = { selector: ".custom" };
-      const marker = refBuilders.one(opts);
-      expect(marker.__options).toBe(opts);
+    it("stores __selector for CSS selector string", () => {
+      const marker = refBuilders.one(".custom");
+      expect(marker.__selector).toBe(".custom");
+    });
+
+    it("treats tag+selector combo as selector, not tag", () => {
+      const marker = refBuilders.one("button.primary");
+      expect(marker.__selector).toBe("button.primary");
+      expect(() =>
+        parseWithSchema(marker.schema, document.createElement("div"), "test"),
+      ).not.toThrow();
+    });
+
+    it("tag string: no __selector at runtime", () => {
+      const marker = refBuilders.one("button");
+      expect(marker.__selector).toBeUndefined();
     });
 
     it("typed one() infers __tag literal", () => {
       const marker = refBuilders.one("button");
       expectTypeOf(marker).toExtend<{ __tag: "button" }>();
+      expectTypeOf<InferRef<typeof marker>>().toEqualTypeOf<HTMLButtonElement>();
     });
 
     it("untyped one() matches SingleRefMarker", () => {
       const marker = refBuilders.one();
       expectTypeOf(marker).toExtend<SingleRefMarker>();
+      expectTypeOf<InferRef<typeof marker>>().toEqualTypeOf<Element>();
     });
 
     it("InferRef: untyped → Element", () => {
@@ -110,10 +124,10 @@ describe("refBuilders", () => {
       expectTypeOf<InferRef<SingleRefMarker<"button">>>().toEqualTypeOf<HTMLButtonElement>();
     });
 
-    it("generic type param with options: typed without runtime tag check", () => {
-      const marker = refBuilders.one<"button">({ selector: ".my-trigger" });
+    it("generic type param with selector: typed without runtime tag check", () => {
+      const marker = refBuilders.one<"button">(".my-trigger");
       expectTypeOf(marker).toExtend<SingleRefMarker<"button">>();
-      expect(marker.__options).toEqual({ selector: ".my-trigger" });
+      expect(marker.__selector).toBe(".my-trigger");
     });
   });
 
@@ -135,26 +149,26 @@ describe("refBuilders", () => {
       expect(() => parseWithSchema(marker.schema, el, "test")).toThrow(TypeError);
     });
 
-    it("stores __options when given options object", () => {
-      const opts = { selector: ".items" };
-      const marker = refBuilders.many(opts);
-      expect(marker.__options).toBe(opts);
+    it("stores __selector for CSS selector string", () => {
+      const marker = refBuilders.many(".items");
+      expect(marker.__selector).toBe(".items");
     });
 
-    it("stores __options when given tag + options", () => {
-      const opts = { selector: ".btns" };
-      const marker = refBuilders.many("button", opts);
-      expect(marker.__options).toBe(opts);
+    it("no __selector for tags array", () => {
+      const marker = refBuilders.many(["button"]);
+      expect(marker.__selector).toBeUndefined();
     });
 
     it("typed many() infers __list and __tag", () => {
       const marker = refBuilders.many("input");
       expectTypeOf(marker).toExtend<{ __list: true; __tag: "input" }>();
+      expectTypeOf<InferRef<typeof marker>>().toEqualTypeOf<HTMLInputElement[]>();
     });
 
     it("untyped many() matches ListRefMarker", () => {
       const marker = refBuilders.many();
       expectTypeOf(marker).toExtend<ListRefMarker>();
+      expectTypeOf<InferRef<typeof marker>>().toEqualTypeOf<Element[]>();
     });
 
     it("InferRef: untyped → Element[]", () => {
@@ -165,10 +179,10 @@ describe("refBuilders", () => {
       expectTypeOf<InferRef<ListRefMarker<"input">>>().toEqualTypeOf<HTMLInputElement[]>();
     });
 
-    it("generic type param with options: typed without runtime tag check", () => {
-      const marker = refBuilders.many<"li">({ selector: ".items" });
+    it("generic type param with selector: typed without runtime tag check", () => {
+      const marker = refBuilders.many<"li">(".items");
       expectTypeOf(marker).toExtend<ListRefMarker<"li">>();
-      expect(marker.__options).toEqual({ selector: ".items" });
+      expect(marker.__selector).toBe(".items");
     });
   });
 
@@ -185,18 +199,18 @@ describe("refBuilders", () => {
       expectTypeOf<InferRef<typeof marker>>().toEqualTypeOf<CustomEl[]>();
     });
 
-    it("one<CustomEl>(options) → works with options", () => {
+    it("one<CustomEl>(selector) → works with selector", () => {
       type CustomEl = HTMLElement & { custom: true };
-      const marker = refBuilders.one<CustomEl>({ selector: ".x" });
+      const marker = refBuilders.one<CustomEl>(".x");
       expectTypeOf<InferRef<typeof marker>>().toEqualTypeOf<CustomEl>();
-      expect(marker.__options).toEqual({ selector: ".x" });
+      expect(marker.__selector).toBe(".x");
     });
 
-    it("many<CustomEl>(options) → works with options", () => {
+    it("many<CustomEl>(selector) → works with selector", () => {
       type CustomEl = HTMLElement & { custom: true };
-      const marker = refBuilders.many<CustomEl>({ selector: ".x" });
+      const marker = refBuilders.many<CustomEl>(".x");
       expectTypeOf<InferRef<typeof marker>>().toEqualTypeOf<CustomEl[]>();
-      expect(marker.__options).toEqual({ selector: ".x" });
+      expect(marker.__selector).toBe(".x");
     });
   });
 
@@ -215,12 +229,22 @@ describe("refBuilders", () => {
       >();
     });
 
-    it("array-of-tags + options", () => {
-      const marker = refBuilders.one(["button", "a"], { selector: ".x" });
+    it("array-of-tags: no __selector", () => {
+      const marker = refBuilders.one(["button", "a"]);
       expectTypeOf<InferRef<typeof marker>>().toEqualTypeOf<
         HTMLButtonElement | HTMLAnchorElement
       >();
-      expect(marker.__options).toEqual({ selector: ".x" });
+      expect(marker.__selector).toBeUndefined();
+    });
+
+    it("mixed tags and selectors in array → falls back to Element", () => {
+      const oneMarker = refBuilders.one(["button", ".some-class"]);
+      expectTypeOf<InferRef<typeof oneMarker>>().toEqualTypeOf<Element>();
+      expect(oneMarker.__selector).toBeUndefined();
+
+      const manyMarker = refBuilders.many(["li", ".some-class"]);
+      expectTypeOf<InferRef<typeof manyMarker>>().toEqualTypeOf<Element[]>();
+      expect(manyMarker.__selector).toBeUndefined();
     });
   });
 
