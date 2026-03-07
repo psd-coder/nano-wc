@@ -17,6 +17,7 @@
     "astro": "^5.17.1",
     "codemirror": "^6.0.1",
     "es-toolkit": "^1.45.1",
+    "linkedom": "^0.18.12",
     "nanoid": "^5.1.6",
     "nanostores": "^1.1.1",
     "valibot": "^1.2.0"
