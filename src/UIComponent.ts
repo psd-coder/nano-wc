@@ -1,4 +1,4 @@
-import { effect, type ReadableAtom, type StoreValue, type WritableAtom } from "nanostores";
+import { effect, type StoreValue } from "nanostores";
 import { invariant } from "./utils.ts";
 
 import type {
@@ -8,12 +8,14 @@ import type {
   Prettify,
   PropsSchema,
   ReactiveProps,
+  WritableStore,
   RefsSchema,
+  ReadableStore,
 } from "./types";
 
 export type ReservedKeys = keyof UIComponent<PropsSchema, RefsSchema>;
 
-type StoreValues<Stores extends ReadableAtom<any>[]> = {
+type StoreValues<Stores extends ReadableStore<any>[]> = {
   [Index in keyof Stores]: StoreValue<Stores[Index]>;
 };
 
@@ -193,8 +195,8 @@ export abstract class UIComponent<
    * Subscribes `callback` to one store or an array of stores and registers automatic cleanup
    * on disconnect. Immediately invokes the callback with the current value(s).
    */
-  effect<T>(store: ReadableAtom<T>, callback: (value: T) => void): void;
-  effect<Stores extends ReadableAtom<any>[]>(
+  effect<T>(store: ReadableStore<T>, callback: (value: T) => void): void;
+  effect<Stores extends ReadableStore<any>[]>(
     stores: [...Stores],
     callback: (...values: StoreValues<Stores>) => void,
   ): void;
@@ -209,14 +211,14 @@ export abstract class UIComponent<
    */
   sync<Prop extends keyof Props & string, Value>(
     prop: Prop,
-    store: WritableAtom<Value>,
+    store: WritableStore<Value>,
     options?: {
       get?: (value: Value) => Infer<Props[Prop]>;
       set?: (value: Infer<Props[Prop]>) => Value;
     },
   ): void {
-    const propStore = this.props[`$${prop}`] as WritableAtom<Infer<Props[Prop]>> | undefined;
-    invariant(propStore, `unknown prop: ${prop}`);
+    const propStore = this.props[`$${prop}`] as WritableStore<Infer<Props[Prop]>> | undefined;
+    invariant(propStore, "unknown prop");
     this.effect(store, (value) => {
       const next = options?.get ? options.get(value) : (value as unknown as Infer<Props[Prop]>);
       if (!Object.is(propStore.get(), next)) propStore.set(next);
@@ -238,10 +240,10 @@ export abstract class UIComponent<
    */
   bind(
     control: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
-    store: WritableAtom<any>,
+    store: WritableStore<any>,
   ): void;
-  bind<V>(control: HTMLElement & { value: NoInfer<V> }, store: WritableAtom<V>): void;
-  bind(control: HTMLElement, store: WritableAtom<unknown>): void {
+  bind<V>(control: HTMLElement & { value: NoInfer<V> }, store: WritableStore<V>): void;
+  bind(control: HTMLElement, store: WritableStore<unknown>): void {
     const inp = control instanceof HTMLInputElement ? control : undefined;
     const isCheckbox = inp?.type === "checkbox";
     const isNumber = inp?.type === "number" || inp?.type === "range";
@@ -250,7 +252,7 @@ export abstract class UIComponent<
       control instanceof HTMLSelectElement ||
       control instanceof HTMLTextAreaElement;
     if (!isNative) {
-      invariant("value" in control, `bind: ${control.tagName} has no .value property`);
+      invariant("value" in control, "has no .value property");
     }
     const isTextLike = (inp !== undefined && !isCheckbox) || control instanceof HTMLTextAreaElement;
     const event = isTextLike ? "input" : "change";
