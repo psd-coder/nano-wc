@@ -1,6 +1,7 @@
 import { define } from "nano-wc";
 import { renderList } from "nano-wc/render";
 import nanoWcUrl from "nano-wc?url";
+import nanoWcRenderUrl from "nano-wc/render?url";
 import { atom, computed } from "nanostores";
 import * as v from "valibot";
 import { debouncedComputed } from "~/utils/debouncedComputed";
@@ -77,7 +78,11 @@ define("x-code-example")
     });
     ctx.effect($debouncedFiles, (files) => {
       ctx.refs.preview.render(files, {
-        imports: { "nano-wc": nanoWcUrl, valibot: "https://esm.sh/valibot@latest" },
+        imports: {
+          "nano-wc": nanoWcUrl,
+          "nano-wc/render": nanoWcRenderUrl,
+          valibot: "https://esm.sh/valibot@latest",
+        },
       });
     });
     ctx.effect($logs, (logs) => {
