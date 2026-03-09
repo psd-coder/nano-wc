@@ -6,7 +6,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "typecheck": "astro check"
   },
   "dependencies": {
     "@codemirror/lang-css": "^6.3.1",
@@ -23,8 +24,10 @@
     "valibot": "^1.2.0"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.6",
     "@astrojs/ts-plugin": "^1.10.6",
     "@css-modules-kit/ts-plugin": "^0.10.0",
-    "@types/node": "^25.3.5"
+    "@types/node": "^25.3.5",
+    "typescript": "^5.9.3"
   }
 }

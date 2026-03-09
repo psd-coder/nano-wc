@@ -39,6 +39,7 @@
     "typecheck": "pnpm run /^typecheck:/",
     "typecheck:src": "tsc -p tsconfig.json --noEmit",
     "typecheck:test": "tsc -p tsconfig.test.json --noEmit",
+    "typecheck:docs": "cd docs && pnpm typecheck",
     "lint": "pnpm run /^lint:/",
     "lint:oxlint": "oxlint .",
     "lint:types": "pnpm run typecheck",
