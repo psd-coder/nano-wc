@@ -525,6 +525,58 @@ const el = new Timer();
 el.start(); // typed
 ```
 
+## Attachments
+
+Attachments are reusable functions that receive the setup context and wire up behavior — effects, event listeners, cleanup — without creating a new component. Think of them as composable mixins for cross-cutting concerns like keyboard navigation, focus trapping, or drag handling.
+
+```typescript
+// attachRovingFocus.ts
+export function attachRovingFocus(
+  ctx: SetupContext,
+  container: HTMLElement,
+  items: HTMLElement[],
+  options: { onFocus?: (el: HTMLElement) => void } = {},
+) {
+  function setActive(index: number) {
+    items.forEach((item, i) => {
+      item.setAttribute("tabindex", i === index ? "0" : "-1");
+    });
+  }
+
+  setActive(0);
+
+  ctx.on(container, "keydown", (e) => {
+    const current = items.indexOf(document.activeElement as HTMLElement);
+    if (current === -1) return;
+    let next = -1;
+    if (e.key === "ArrowRight") next = (current + 1) % items.length;
+    if (e.key === "ArrowLeft") next = (current - 1 + items.length) % items.length;
+    if (next !== -1) {
+      e.preventDefault();
+      setActive(next);
+      items[next].focus();
+      options.onFocus?.(items[next]);
+    }
+  });
+}
+```
+
+Use it in any component's setup:
+
+```typescript
+import { attachRovingFocus } from "./attachRovingFocus";
+
+define("x-tabs")
+  .withRefs((r) => ({ tablist: r.one("div"), tabs: r.many("[role=tab]") }))
+  .setup((ctx) => {
+    attachRovingFocus(ctx, ctx.refs.tablist, ctx.refs.tabs, {
+      onFocus: (el) => activate(el.dataset.value),
+    });
+  });
+```
+
+Since attachments receive `ctx`, any listeners or effects they register are automatically cleaned up on disconnect — no manual teardown needed. They can also return values to expose state or methods to the calling component.
+
 ## TypeScript
 
 ### Typed events
