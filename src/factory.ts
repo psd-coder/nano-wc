@@ -214,16 +214,18 @@ export function createComponent<
   class Component extends UIComponent<Props, Refs> {
     static readonly elementName = name;
     #props!: ReactivePropsResult<Props>;
+    #refs: InferRefs<Refs> | undefined;
 
     get host(): HTMLElement & ComponentProps<Props> {
       return this as HTMLElement & ComponentProps<Props>;
     }
 
     get refs(): InferRefs<Refs> {
-      return this.withCache("refs", () => {
+      if (!this.#refs) {
         customElements.upgrade(this);
-        return collectRefs(this, refsSchema);
-      });
+        this.#refs = collectRefs(this, refsSchema);
+      }
+      return this.#refs;
     }
 
     get props(): ReactiveProps<Props> {
@@ -246,6 +248,7 @@ export function createComponent<
     }
 
     connectedCallback() {
+      this.#refs = undefined;
       this.#props.hydrateProps(this);
       const result = setupFn(this);
       if (result) {

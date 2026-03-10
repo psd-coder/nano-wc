@@ -118,7 +118,6 @@ describe("lifecycle cleanup", () => {
     expectTypeOf<Ctx>().toHaveProperty("effect");
     expectTypeOf<Ctx>().toHaveProperty("sync");
     expectTypeOf<Ctx>().toHaveProperty("bind");
-    expectTypeOf<Ctx>().toHaveProperty("withCache");
     expectTypeOf<Ctx>().toHaveProperty("onCleanup");
     expectTypeOf<Ctx>().toHaveProperty("consume");
     expectTypeOf<Ctx>().toHaveProperty("getElement");
@@ -214,55 +213,6 @@ describe("emit", () => {
     });
     mount(`<${tag}></${tag}>`);
     expect(captured?.bubbles).toBe(false);
-  });
-});
-
-describe("withCache", () => {
-  it("computes on first call", () => {
-    const tag = uniqueTag("cache");
-    const compute = vi.fn(() => 42);
-    define(tag, (ctx) => {
-      expect(ctx.withCache("k", compute)).toBe(42);
-    });
-    mount(`<${tag}></${tag}>`);
-    expect(compute).toHaveBeenCalledOnce();
-  });
-
-  it("returns cached on second call", () => {
-    const tag = uniqueTag("cache");
-    const compute = vi.fn(() => 42);
-    define(tag, (ctx) => {
-      ctx.withCache("k", compute);
-      ctx.withCache("k", compute);
-    });
-    mount(`<${tag}></${tag}>`);
-    expect(compute).toHaveBeenCalledOnce();
-  });
-
-  it("cleared on disconnect", () => {
-    const tag = uniqueTag("cache");
-    const compute = vi.fn(() => 99);
-    define(tag, (ctx) => {
-      ctx.withCache("k", compute);
-    });
-    const el = mount(`<${tag}></${tag}>`);
-    el.remove();
-    document.body.appendChild(el);
-    expect(compute).toHaveBeenCalledTimes(2);
-  });
-
-  it("recomputes after reconnect", () => {
-    const tag = uniqueTag("cache");
-    let counter = 0;
-    define(tag, (ctx) => {
-      const val = ctx.withCache("k", () => ++counter);
-      return { val };
-    });
-    const el = mount(`<${tag}></${tag}>`);
-    expect((el as any).val).toBe(1);
-    el.remove();
-    document.body.appendChild(el);
-    expect((el as any).val).toBe(2);
   });
 });
 

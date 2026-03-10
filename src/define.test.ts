@@ -143,7 +143,6 @@ describe("define", () => {
       expectTypeOf<"host">().toMatchTypeOf<ReservedKeys>();
       expectTypeOf<"onCleanup">().toMatchTypeOf<ReservedKeys>();
       expectTypeOf<"consume">().toMatchTypeOf<ReservedKeys>();
-      expectTypeOf<"withCache">().toMatchTypeOf<ReservedKeys>();
     });
 
     it("ReservedKeys includes HTMLElement members via prototype chain", () => {

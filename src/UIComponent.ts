@@ -42,7 +42,6 @@ export abstract class UIComponent<
   Props extends PropsSchema,
   Refs extends RefsSchema,
 > extends HTMLElement {
-  #cache = new Map<string, unknown>();
   #cleanups: VoidFunction[] = [];
 
   abstract get refs(): Prettify<InferRefs<Refs>>;
@@ -50,7 +49,6 @@ export abstract class UIComponent<
   abstract get host(): HTMLElement & ComponentProps<Props>;
 
   protected disconnectedCallback(): void {
-    this.#cache.clear();
     let err: unknown;
     for (const fn of this.#cleanups) {
       try {
@@ -127,17 +125,6 @@ export abstract class UIComponent<
         detail,
       }),
     );
-  }
-
-  /**
-   * Returns a cached value for `key`, computing and storing it on the first call.
-   * Cache is cleared on disconnect.
-   */
-  withCache<T>(key: string, compute: () => T): T {
-    if (this.#cache.has(key)) return this.#cache.get(key) as T;
-    const value = compute();
-    this.#cache.set(key, value);
-    return value;
   }
 
   /** Queries a single required element by CSS selector. Throws if not found. */

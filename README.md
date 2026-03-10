@@ -418,14 +418,6 @@ define("x-tab").setup((ctx) => {
 });
 ```
 
-#### `withCache(key, compute)`
-
-Memoize a value for the component's connected lifecycle. Cache clears on disconnect.
-
-```typescript
-const parsed = ctx.withCache("config", () => JSON.parse(heavy));
-```
-
 #### `onCleanup(callback)`
 
 Register arbitrary teardown logic to run on disconnect.
