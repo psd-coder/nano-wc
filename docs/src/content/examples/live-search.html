@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Live Search</title>
+  <meta name="description"
+    content="Real-time country filtering with p.json(), valibot schema, ctx.bind, ctx.effect, renderList, and computed stores.">
+  <script type="importmap">
+    {
+      "imports": {
+        "nano-wc": "https://esm.sh/nano-wc@latest",
+        "nano-wc/render": "https://esm.sh/nano-wc@latest/render",
+        "nanostores": "https://esm.sh/nanostores@latest",
+        "valibot": "https://esm.sh/valibot@latest"
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <div data-type="html">
+    <x-live-search>
+      <script type="application/json" data-prop="countries">[
+        { "name": "Argentina", "code": "AR" }, { "name": "Australia", "code": "AU" },
+        { "name": "Brazil", "code": "BR" }, { "name": "Canada", "code": "CA" },
+        { "name": "China", "code": "CN" }, { "name": "Colombia", "code": "CO" },
+        { "name": "Czech Republic", "code": "CZ" }, { "name": "Denmark", "code": "DK" },
+        { "name": "Egypt", "code": "EG" }, { "name": "Finland", "code": "FI" },
+        { "name": "France", "code": "FR" }, { "name": "Germany", "code": "DE" },
+        { "name": "Greece", "code": "GR" }, { "name": "India", "code": "IN" },
+        { "name": "Indonesia", "code": "ID" }, { "name": "Ireland", "code": "IE" },
+        { "name": "Italy", "code": "IT" }, { "name": "Japan", "code": "JP" },
+        { "name": "Mexico", "code": "MX" }, { "name": "Netherlands", "code": "NL" },
+        { "name": "New Zealand", "code": "NZ" }, { "name": "Norway", "code": "NO" },
+        { "name": "Poland", "code": "PL" }, { "name": "Portugal", "code": "PT" },
+        { "name": "South Korea", "code": "KR" }, { "name": "Spain", "code": "ES" },
+        { "name": "Sweden", "code": "SE" }, { "name": "Switzerland", "code": "CH" },
+        { "name": "United Kingdom", "code": "GB" }, { "name": "United States", "code": "US" }
+      ]</script>
+      <input data-ref="input" type="text" placeholder="Search countries..." />
+      <p data-ref="stats"></p>
+      <ul data-ref="list">
+        <template data-ref="itemTpl">
+          <li>
+            <span data-code></span>
+            <span data-name></span>
+          </li>
+        </template>
+      </ul>
+    </x-live-search>
+  </div>
+
+  <script type="module" data-type="javascript">
+    import { define } from "nano-wc";
+    import { renderList } from "nano-wc/render";
+    import { atom, computed } from "nanostores";
+    import { array, object, string } from "valibot";
+
+    const CountrySchema = array(object({ name: string(), code: string() }));
+
+    define("x-live-search")
+      .withProps(({ json }) => ({
+        countries: json(CountrySchema, []),
+      }))
+      .withRefs(({ one }) => ({
+        input: one("input"),
+        stats: one("p"),
+        list: one("ul"),
+        itemTpl: one("template"),
+      }))
+      .setup((ctx) => {
+        const $query = atom("");
+        const $filtered = computed([$query, ctx.props.$countries], (query, countries) => {
+          if (!query) return countries;
+          const q = query.toLowerCase();
+          return countries.filter(
+            (c) => c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q)
+          );
+        });
+
+        ctx.bind(ctx.refs.input, $query);
+
+        ctx.effect($filtered, (filtered) => {
+          const total = ctx.props.$countries.get().length;
+          ctx.refs.stats.textContent = `${filtered.length} of ${total} countries`;
+          renderList(ctx.refs.list, ctx.refs.itemTpl, {
+            data: filtered,
+            key: (c) => c.code,
+            update: (el, country) => {
+              ctx.getElement(el, "[data-code]").textContent = country.code;
+              ctx.getElement(el, "[data-name]").textContent = country.name;
+            },
+          });
+        });
+      });
+  </script>
+
+  <style data-type="css">
+    x-live-search {
+      display: block;
+    }
+
+    x-live-search input {
+      width: 100%;
+      padding: 8px 12px;
+      font-size: 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+
+    x-live-search input:focus {
+      outline: 2px solid #2563eb;
+      outline-offset: -1px;
+      border-color: #2563eb;
+    }
+
+    x-live-search p {
+      color: #6b7280;
+      font-size: 13px;
+      margin: 8px 0;
+    }
+
+    x-live-search ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    x-live-search li {
+      display: flex;
+      gap: 12px;
+      padding: 6px 8px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    x-live-search li:hover {
+      background: #f9fafb;
+    }
+
+    x-live-search [data-code] {
+      font-family: monospace;
+      color: #6b7280;
+      min-width: 2.5em;
+    }
+  </style>
+</body>
+
+</html>

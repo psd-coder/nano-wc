@@ -19,7 +19,7 @@ invariant(firstFile, "No files provided");
 ---
 
 <x-code-example class={styles.host}>
-  <script type="application/json" data-prop="files" set:html={JSON.stringify(files)} is:inline />
+  <script type="application/json" data-prop="files" set:html={JSON.stringify(files).replaceAll("</", "<\\/")} is:inline />
   <ResizablePanes direction="horizontal" class={styles.panes}>
     <ResizablePane class:list={styles.pane}>
       <Tabs active={firstFile.name} data-ref="x-code-example:tabs" class={styles.fileTabs}>
