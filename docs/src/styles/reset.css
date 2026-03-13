@@ -23,8 +23,8 @@
   /* Avoid overflow caused by embedded content */
   :where(audio, iframe, img, svg, video, canvas) {
     display: block;
-    max-block-size: 100%;
     max-inline-size: 100%;
+    max-block-size: 100%;
   }
 
   /* Prevent fieldsets from causing overflow */
@@ -41,8 +41,8 @@
   :where(button, input, select, textarea) {
     font-family: inherit;
     font-size: inherit;
+    color: currentcolor;
     letter-spacing: inherit;
-    color: currentColor;
   }
 
   /* Improve table styling */
@@ -52,27 +52,29 @@
   }
 
   :where(th, td) {
-    border: 1px solid;
     padding: 0.25em 0.5em;
+    border: 1px solid;
   }
 
   /* Impove text rendering defaults */
   :where(html) {
-    -webkit-text-size-adjust: none;
+    scrollbar-gutter: stable;
     text-size-adjust: none;
   }
 
   :where(body) {
     line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
     hanging-punctuation: first allow-end last;
+
+    -webkit-font-smoothing: antialiased;
   }
 
   /** Other helpful defaults **/
+
   /* Remove list styles on ul, ol elements with a list role, which suggests default styling will be removed */
   :where(html, body, #root) {
-    padding: 0;
     margin: 0;
+    padding: 0;
   }
 
   :where(#root) {
