@@ -97,10 +97,15 @@ const { class: className, expanded = false, expandedSize, max, ...rest } = Astro
       let containerHeight = 0;
       let wasAtMin = false;
 
-      attachResizing(ctx, {
+      const { setAriaValue } = attachResizing(ctx, {
         position: "before",
         element: ctx.host,
         direction: "vertical",
+        label: "Resize pane",
+        minValue: 0,
+        maxValue: maxSize,
+        step: 2,
+        initialValue: ctx.props.$expanded.get() ? ctx.props.$expandedSize.get() : 0,
         onDragStart(info) {
           startHeight = info.elementSize;
           containerHeight = info.containerSize;
@@ -115,14 +120,25 @@ const { class: className, expanded = false, expandedSize, max, ...rest } = Astro
           if (!isAtMin) {
             ctx.host.style.flexBasis = `${newHeight}px`;
             lastHeightPx = newHeight;
+            setAriaValue((newHeight / containerHeight) * 100);
           }
 
           if (isAtMin && !wasAtMin) {
             if (ctx.props.$expanded.get()) ctx.props.$expanded.set(false);
+            setAriaValue(0);
           } else if (!isAtMin && wasAtMin) {
             if (!ctx.props.$expanded.get()) ctx.props.$expanded.set(true);
           }
           wasAtMin = isAtMin;
+        },
+        onKeyResize(value) {
+          if (value <= 0) {
+            if (ctx.props.$expanded.get()) ctx.props.$expanded.set(false);
+          } else {
+            if (!ctx.props.$expanded.get()) ctx.props.$expanded.set(true);
+            ctx.host.style.flexBasis = `${value}%`;
+            lastHeightPx = null;
+          }
         },
       });
     });

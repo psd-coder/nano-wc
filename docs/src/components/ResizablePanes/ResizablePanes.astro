@@ -32,19 +32,31 @@ const { class: className, direction } = Astro.props;
       let startBasis = 0;
       let containerSize = 0;
 
-      const { handle } = attachResizing(ctx, {
+      function clampPercent(percent: number) {
+        const min = ctx.props.$minSize.get();
+        const max = ctx.props.$maxSize.get();
+        return Math.min(max, Math.max(min, percent));
+      }
+
+      const { handle, setAriaValue } = attachResizing(ctx, {
         position: "after",
         element: startPane,
         direction: ctx.props.$direction.get(),
+        label: "Resize panes",
+        minValue: ctx.props.$minSize.get(),
+        maxValue: ctx.props.$maxSize.get(),
+        step: 2,
         onDragStart(info) {
           startBasis = info.elementSize;
           containerSize = info.containerSize;
         },
         onDrag(delta) {
-          const min = ctx.props.$minSize.get();
-          const max = ctx.props.$maxSize.get();
-          const pct = Math.min(max, Math.max(min, ((startBasis + delta) / containerSize) * 100));
-          startPane.style.flexBasis = `${pct}%`;
+          const percent = clampPercent(((startBasis + delta) / containerSize) * 100);
+          startPane.style.flexBasis = `${percent}%`;
+          setAriaValue(percent);
+        },
+        onKeyResize(value) {
+          startPane.style.flexBasis = `${value}%`;
         },
       });
 

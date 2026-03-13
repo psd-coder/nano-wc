@@ -19,6 +19,12 @@
     background: var(--color-border-hover);
   }
 
+  &:focus-visible {
+    background: var(--color-accent);
+    outline: 2px solid var(--color-accent);
+    outline-offset: -1px;
+  }
+
   &[data-direction="vertical"] {
     cursor: row-resize;
     height: 1px;

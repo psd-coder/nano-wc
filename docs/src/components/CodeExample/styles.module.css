@@ -81,14 +81,19 @@
   color: var(--color-text-secondary);
 
   &::before {
-    content: "▶ ";
-    font-size: 0.6em;
+    content: "▶";
+
+    display: inline-block;
+
+    margin-right: 0.3em;
+
+    font-size: var(--text-xs);
+
+    transition: transform 0.15s;
   }
 
-  [aria-expanded="true"] & {
-    &::before {
-      content: "▼ ";
-    }
+  [aria-expanded="true"] &::before {
+    transform: rotate(90deg);
   }
 }
 
