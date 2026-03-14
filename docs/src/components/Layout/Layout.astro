@@ -39,6 +39,7 @@ const { title } = Astro.props;
   <link rel="shortcut icon" href={getHref("favicon.ico")} />
   <link rel="apple-touch-icon" sizes="180x180" href={getHref("apple-touch-icon.png")} />
   <link rel="manifest" href={getHref("site.webmanifest")} />
+  <link rel="sitemap" href={getHref("sitemap-index.xml")} />
   <Font cssVariable="--font-sans" preload />
   <Font cssVariable="--font-mono" preload />
   <title>{title} | {siteConfig.name}</title>

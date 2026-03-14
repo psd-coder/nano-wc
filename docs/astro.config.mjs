@@ -3,6 +3,7 @@ import { defineConfig, fontProviders } from "astro/config";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import sitemap from "@astrojs/sitemap";
 import postcssPresetEnv from "postcss-preset-env";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeSlug from "rehype-slug";
@@ -32,6 +33,7 @@ function moduleReferencePlugin(moduleName, srcEntry, distEntry) {
 export default defineConfig({
   site: "https://psd-coder.github.io",
   base: process.env.CI ? "/nano-wc/" : "/",
+  integrations: [sitemap()],
   markdown: {
     shikiConfig: {
       themes: { light: "catppuccin-latte", dark: "catppuccin-mocha" },
