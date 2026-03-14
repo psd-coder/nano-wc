@@ -45,6 +45,7 @@ export default defineConfig({
       }],
     ]
   },
+  // @ts-ignore -- 'fonts' types lag behind the stable Astro release
   fonts: [
     {
       provider: fontProviders.local(),
@@ -76,6 +77,9 @@ export default defineConfig({
     },
   ],
   vite: {
+    optimizeDeps: {
+      entries: ["!src/content/examples/**"],
+    },
     css: {
       modules: {
         generateScopedName(name, filename) {
