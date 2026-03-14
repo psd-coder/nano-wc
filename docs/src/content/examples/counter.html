@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Counter</title>
+  <meta name="description" content="A minimal counter using nano-wc with nanostores reactivity.">
+  <script type="importmap">
+    {
+      "imports": {
+        "nano-wc": "https://esm.sh/nano-wc@latest",
+        "nanostores": "https://esm.sh/nanostores@latest"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div data-type="html">
+    <x-counter>
+      <div>
+        <input data-ref="stepInput" type="range" min="1" max="50" value="1">
+        <span>Step: <span data-ref="step">1</span></span>
+      <div>
+      <div>
+        <button data-ref="decrement">-</button>
+        <span data-ref="count">0</span>
+        <button data-ref="increment">+</button>
+      </div>
+    </x-counter>
+  </div>
+
+  <script type="module" data-type="javascript">
+    import { define } from 'nano-wc';
+    import { atom } from 'nanostores';
+
+    define('x-counter')
+      .withRefs(({ one }) => ({
+        stepInput: one('input'),
+        step: one('span'),
+        decrement: one('button'),
+        increment: one('button'),
+        count: one('span')
+      }))
+      .withProps((p) => ({ initial: p.number(), step: p.number(1) }))
+      .setup((ctx) => {
+        const $count = atom(ctx.props.$initial.get());
+
+        ctx.bind(ctx.refs.stepInput, ctx.props.$step);
+        ctx.on(ctx.refs.increment, 'click', () => $count.set($count.get() + ctx.props.$step.get()));
+        ctx.on(ctx.refs.decrement, 'click', () => $count.set($count.get() - ctx.props.$step.get()));
+        ctx.effect($count, (val) => {
+          ctx.refs.count.textContent = String(val);
+          console.log('Count changed:', val);
+        });
+        ctx.effect(ctx.props.$step, (val) => {
+          ctx.refs.step.textContent = String(val);
+          console.log("Step changed:", val);
+        });
+      });
+  </script>
+
+</body>
+</html>

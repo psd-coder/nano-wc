@@ -1,0 +1,23 @@
+{
+  "extends": "astro/tsconfigs/strictest",
+  "include": [".astro/types.d.ts", "src/**/*"],
+  "exclude": ["node_modules", "public", "dist"],
+  "compilerOptions": {
+    "allowUnreachableCode": true,
+    "exactOptionalPropertyTypes": false,
+    "erasableSyntaxOnly": true,
+    "plugins": [
+      { "name": "@astrojs/ts-plugin" },
+      { "name": "@css-modules-kit/ts-plugin" }
+    ],
+    "rootDirs": [".", "./generated"],
+    "paths": {
+      "~/*": ["./src/*"],
+      "nano-wc": ["../src"],
+      "nano-wc/*": ["../src/*"]
+    }
+  },
+  "cmkOptions": {
+    "enabled": true
+  }
+}

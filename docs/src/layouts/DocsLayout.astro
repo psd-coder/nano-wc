@@ -1,0 +1,47 @@
+---
+import { Layout } from "~/components/Layout";
+import { Icon } from "~/components/Icon";
+import { MobileTableOfContents, TableOfContents } from "~/components/TableOfContents";
+import { getHref } from "~/utils/urls";
+import styles from "./styles.module.css";
+
+type Heading = {
+  depth: number;
+  slug: string;
+  text: string;
+};
+
+type Props = {
+  title: string;
+  slug: string;
+  headings: Heading[];
+};
+
+const { title, slug, headings } = Astro.props;
+---
+
+<Layout title={title}>
+  {headings.length > 0 && (
+    <TableOfContents
+      slot="sidebar"
+      headings={headings}
+      itemsSelector="[data-docs-content] :is(h2, h3)[id]"
+    />
+  )}
+  <article class="prose" data-docs-content>
+    <div class={styles.headingRow}>
+      <h1>{title}</h1>
+      <a
+        href={getHref(`${slug}.md`)}
+        target="_blank"
+        rel="noreferrer"
+        class={styles.mdLink}
+        aria-label="View as Markdown"
+      >
+        <Icon name="markdown" size={32} />
+      </a>
+      <MobileTableOfContents headings={headings} />
+    </div>
+    <slot />
+  </article>
+</Layout>
